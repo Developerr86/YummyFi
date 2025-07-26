@@ -1,0 +1,369 @@
+.menu-management {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.menu-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.edit-btn, .save-btn, .cancel-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.edit-btn:hover, .save-btn:hover, .cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.save-btn {
+  background: rgba(40, 167, 69, 0.8);
+  border-color: rgba(40, 167, 69, 0.8);
+}
+
+.cancel-btn {
+  background: rgba(220, 53, 69, 0.8);
+  border-color: rgba(220, 53, 69, 0.8);
+}
+
+.menu-content {
+  padding: 30px;
+}
+
+.menu-section {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #f0f2f5;
+}
+
+.menu-section:last-child {
+  border-bottom: none;
+}
+
+.menu-section h3 {
+  color: #333;
+  font-size: 1.4rem;
+  margin: 0 0 20px 0;
+  font-weight: 600;
+}
+
+.title-input {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: border-color 0.3s ease;
+}
+
+.title-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.menu-title-display {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.menu-item-card {
+  background: #f8f9fa;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.menu-item-card:hover {
+  border-color: #667eea;
+}
+
+.item-display {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.item-emoji {
+  font-size: 1.5rem;
+  min-width: 40px;
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.item-desc {
+  color: #666;
+  font-style: italic;
+}
+
+.item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-item-btn, .delete-item-btn, .done-btn {
+  background: none;
+  border: 2px solid #e1e5e9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-item-btn:hover {
+  border-color: #667eea;
+  background: #667eea;
+  color: white;
+}
+
+.delete-item-btn:hover {
+  border-color: #dc3545;
+  background: #dc3545;
+  color: white;
+}
+
+.done-btn:hover {
+  border-color: #28a745;
+  background: #28a745;
+  color: white;
+}
+
+.item-edit-form {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.emoji-input {
+  width: 60px;
+  padding: 10px;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.name-input {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.desc-input {
+  flex: 2;
+  min-width: 200px;
+  padding: 10px;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+}
+
+.emoji-input:focus, .name-input:focus, .desc-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.add-item-form {
+  background: linear-gradient(135deg, #667eea15, #764ba215);
+  border: 2px dashed #667eea;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.add-item-form h4 {
+  margin: 0 0 15px 0;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.new-item-inputs {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.pricing-card {
+  background: #f8f9fa;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.pricing-card h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.pricing-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pricing-inputs label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  color: #555;
+}
+
+.pricing-inputs input {
+  width: 80px;
+  padding: 8px;
+  border: 2px solid #e1e5e9;
+  border-radius: 4px;
+}
+
+.pricing-inputs input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.pricing-display p {
+  margin: 8px 0;
+  color: #555;
+}
+
+.delivery-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.setting-item label {
+  font-weight: 600;
+  color: #333;
+  min-width: 150px;
+}
+
+.setting-item input {
+  flex: 1;
+  max-width: 300px;
+  padding: 10px;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+}
+
+.setting-item input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.setting-item span {
+  color: #555;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .menu-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .item-edit-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .new-item-inputs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .setting-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .setting-item label {
+    min-width: auto;
+  }
+}

@@ -1,85 +1,113 @@
-import React from 'react';
+import React, { useState } from 'react';
+import OrderModal from './OrderModal';
 import './TodaysMenu.css';
 
 const TodaysMenu = () => {
-  const menuItems = [
-    {
-      id: 1,
-      name: "Grilled Salmon",
-      description: "Fresh Atlantic salmon with herbs and lemon",
-      price: "$24.99",
-      category: "Main Course",
-      image: "🐟"
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+
+  const todaysItem = {
+    title: "Tonight's YummyFi Dinner Delight!",
+    items: [
+      { name: "Aloo Matar", description: "Comforting, flavorful & hearty", emoji: "🍛" },
+      { name: "Dal Tadka", description: "Comforting & full of taste", emoji: "🍲" },
+      { name: "Jeera Rice", description: "Fragrant, mild & delicious", emoji: "🍚" },
+      { name: "Salad", description: "Fresh, crunchy & refreshing", emoji: "🥗" },
+      { name: "Chapati", description: "Soft & wholesome", emoji: "🍞" },
+      { name: "Jalebi", description: "A perfect sweet finish! 😋", emoji: "🍮" }
+    ],
+    pricing: {
+      C3: { mrp: 70, special: 59, chapati: 3 },
+      C4: { mrp: 80, special: 63, chapati: 4 }
     },
-    {
-      id: 2,
-      name: "Caesar Salad",
-      description: "Crisp romaine lettuce with parmesan and croutons",
-      price: "$12.99",
-      category: "Salad",
-      image: "🥗"
-    },
-    {
-      id: 3,
-      name: "Margherita Pizza",
-      description: "Classic pizza with fresh mozzarella and basil",
-      price: "$18.99",
-      category: "Pizza",
-      image: "🍕"
-    },
-    {
-      id: 4,
-      name: "Chocolate Lava Cake",
-      description: "Warm chocolate cake with molten center",
-      price: "$8.99",
-      category: "Dessert",
-      image: "🍰"
-    },
-    {
-      id: 5,
-      name: "Beef Burger",
-      description: "Juicy beef patty with lettuce, tomato, and cheese",
-      price: "$16.99",
-      category: "Burger",
-      image: "🍔"
-    },
-    {
-      id: 6,
-      name: "Pasta Carbonara",
-      description: "Creamy pasta with bacon and parmesan",
-      price: "$19.99",
-      category: "Pasta",
-      image: "🍝"
-    }
-  ];
+    deliveryTime: "8:00 PM to 9:00 PM",
+    orderDeadline: "5:00 PM",
+    coverImage: "./src/assets/cover.jpeg"
+  };
+
+  const handleOrder = () => {
+    setIsOrderModalOpen(true);
+  };
 
   return (
     <div className="todays-menu">
-      <div className="menu-header">
-        <h2>Today's Menu</h2>
-        <p>Fresh ingredients, amazing flavors</p>
-      </div>
-      
-      <div className="menu-grid">
-        {menuItems.map(item => (
-          <div key={item.id} className="menu-item">
-            <div className="menu-item-image">
-              <span className="emoji">{item.image}</span>
-            </div>
-            <div className="menu-item-content">
-              <div className="menu-item-header">
-                <h3>{item.name}</h3>
-                <span className="category">{item.category}</span>
+      <div className="featured-item">
+        <div className="item-header">
+          <h2>🌙✨ {todaysItem.title} ✨🌙</h2>
+        </div>
+
+        <div className="item-cover">
+          <img
+            src={todaysItem.coverImage}
+            alt="Today's Featured Meal"
+            className="cover-image"
+          />
+        </div>
+
+        <div className="item-content">
+          <div className="menu-items">
+            {todaysItem.items.map((item, index) => (
+              <div key={index} className="menu-item-row">
+                <span className="item-emoji">{item.emoji}</span>
+                <span className="item-name">{item.name}</span>
+                <span className="item-desc">– {item.description}</span>
               </div>
-              <p className="description">{item.description}</p>
-              <div className="menu-item-footer">
-                <span className="price">{item.price}</span>
-                <button className="add-to-cart">Add to Cart</button>
+            ))}
+          </div>
+
+          <div className="pricing-section">
+            <h3>💰 Pricing Options</h3>
+            <div className="price-preview">
+              <div className="price-option-preview">
+                <div className="price-details">
+                  <span className="mrp">MRP: ₹70-80</span>
+                  <span className="special-price">Special Price: ₹59-63</span>
+                  <span className="chapati-info">(Choose chapati option when ordering)</span>
+                </div>
               </div>
             </div>
           </div>
-        ))}
+
+          <div className="payment-info">
+            <h3>💳 Payment Options</h3>
+            <div className="payment-options">
+              <div className="payment-option">
+                <span className="check">✅</span>
+                <span>Prepaid – No extra charges</span>
+              </div>
+              <div className="payment-option">
+                <span className="check">✅</span>
+                <span>COD – ₹5 extra per parcel</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="delivery-info">
+            <div className="info-row">
+              <span className="icon">⏱️</span>
+              <span>Please confirm your order before {todaysItem.orderDeadline}</span>
+            </div>
+            <div className="info-row">
+              <span className="icon">🚚</span>
+              <span>Delivery between {todaysItem.deliveryTime}</span>
+            </div>
+          </div>
+
+          <button className="order-button" onClick={handleOrder}>
+            🍽️ Order Now & Enjoy Your Wholesome Meal! 😋
+          </button>
+
+          <div className="footer-message">
+            <p>🍽️ A warm, tasty dinner is just a message away! 😋</p>
+            <p className="team-signature">— With ❤️ from Team YummyFi</p>
+          </div>
+        </div>
       </div>
+
+      <OrderModal
+        isOpen={isOrderModalOpen}
+        onClose={() => setIsOrderModalOpen(false)}
+        itemData={todaysItem}
+      />
     </div>
   );
 };

@@ -12,7 +12,7 @@ const Home = () => {
         <div className="header-content">
           <h1>YummyFi</h1>
           <div className="user-info">
-            <span>Welcome, {user?.email || 'User'}!</span>
+            <span>Welcome, {user?.name || user?.email || 'User'}!</span>
             <button onClick={logout} className="logout-button">
               Logout
             </button>
