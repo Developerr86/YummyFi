@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { app } from '../firebase';
+import { useAuth } from '../context/AuthContext';
 import './OrderModal.css';
 
 const OrderModal = ({ isOpen, onClose, itemData }) => {
+
+  const {user} = useAuth();
+
   const [orderDetails, setOrderDetails] = useState({
     address: '',
     instructions: '',
@@ -18,12 +24,30 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
     }));
   };
 
-  const handleConfirmOrder = () => {
+  const handleConfirmOrder = async () => {
     if (!orderDetails.address.trim()) {
       alert('Please enter your delivery address');
       return;
     }
+
+    const db = getFirestore(app);
+    try {
+      // Add a new document to the 'orders' collection
+      await addDoc(collection(db, 'orders'), {
+        // Include all the order details
+        ...orderDetails,
+        userId: user.uid, // VERY IMPORTANT: Link the order to the user
+        userEmail: user.email,
+        orderTime: new Date(), // Use a server timestamp for accuracy
+        status: 'pending', // Initial status
+        totalPrice: totalPrice,
+        menuTitle: itemData.title
+      });
     setShowConfirmation(true);
+    } catch (error) {
+      console.error("Error placing order: ", error);
+      alert("Could not place your order. Please try again.");
+    }
   };
 
   const handleCloseConfirmation = () => {

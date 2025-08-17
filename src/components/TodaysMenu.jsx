@@ -1,32 +1,56 @@
-import React, { useState } from 'react';
 import OrderModal from './OrderModal';
+import { getFirestore, doc, onSnapshot } from "firebase/firestore";
+import { app } from '../firebase';
+import React, { useState, useEffect } from 'react';
 import './TodaysMenu.css';
 
 const TodaysMenu = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  // REPLACE the hardcoded 'todaysItem' object with this state:
+  const [todaysItem, setTodaysItem] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const todaysItem = {
-    title: "Tonight's YummyFi Dinner Delight!",
-    items: [
-      { name: "Aloo Matar", description: "Comforting, flavorful & hearty", emoji: "🍛" },
-      { name: "Dal Tadka", description: "Comforting & full of taste", emoji: "🍲" },
-      { name: "Jeera Rice", description: "Fragrant, mild & delicious", emoji: "🍚" },
-      { name: "Salad", description: "Fresh, crunchy & refreshing", emoji: "🥗" },
-      { name: "Chapati", description: "Soft & wholesome", emoji: "🍞" },
-      { name: "Jalebi", description: "A perfect sweet finish! 😋", emoji: "🍮" }
-    ],
-    pricing: {
-      C3: { mrp: 70, special: 59, chapati: 3 },
-      C4: { mrp: 80, special: 63, chapati: 4 }
-    },
-    deliveryTime: "8:00 PM to 9:00 PM",
-    orderDeadline: "5:00 PM",
-    coverImage: "./src/assets/cover.jpeg"
-  };
+  // ADD this useEffect to fetch the menu data
+  useEffect(() => {
+    const db = getFirestore(app);
+    const menuRef = doc(db, 'menu', 'todaysMenu');
+
+    // onSnapshot listens for real-time changes
+    const unsubscribe = onSnapshot(menuRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setTodaysItem(docSnap.data());
+      } else {
+        console.log("Today's menu document does not exist!");
+        // Handle the case where the menu hasn't been set by the admin yet
+        setTodaysItem(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleOrder = () => {
     setIsOrderModalOpen(true);
   };
+
+  // Add a loading state for a better user experience
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2rem' }}>
+        Loading today's menu...
+      </div>
+    );
+  }
+
+  // Add a check in case the menu doesn't exist
+  if (!todaysItem) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2rem' }}>
+        The menu for today has not been posted yet. Please check back later!
+      </div>
+    );
+  }
 
   return (
     <div className="todays-menu">

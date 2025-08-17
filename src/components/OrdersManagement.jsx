@@ -1,63 +1,40 @@
 import React, { useState, useEffect } from 'react';
+import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc } from "firebase/firestore";
+import { app } from '../firebase';
 import './OrdersManagement.css';
 
 const OrdersManagement = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // Mock orders data - in real app, this would come from API
   useEffect(() => {
-    const mockOrders = [
-      {
-        id: 1,
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        address: '123 Main St, Apartment 4B, Near Central Park, New York, NY 10001',
-        instructions: 'Ring the doorbell twice, leave at door if no answer',
-        chapatiOption: 'C3',
-        chapatiCount: 3,
-        paymentMethod: 'prepaid',
-        totalAmount: 59,
-        orderTime: '2024-01-15 14:30:00',
-        status: 'pending',
-        menuTitle: "Tonight's YummyFi Dinner Delight!"
-      },
-      {
-        id: 2,
-        customerName: 'Jane Smith',
-        customerEmail: 'jane@example.com',
-        address: '456 Oak Avenue, Building C, Floor 2, Los Angeles, CA 90210',
-        instructions: 'Call when you arrive, security gate requires buzzing',
-        chapatiOption: 'C4',
-        chapatiCount: 4,
-        paymentMethod: 'cod',
-        totalAmount: 68,
-        orderTime: '2024-01-15 15:15:00',
-        status: 'confirmed',
-        menuTitle: "Tonight's YummyFi Dinner Delight!"
-      },
-      {
-        id: 3,
-        customerName: 'Mike Johnson',
-        customerEmail: 'mike@example.com',
-        address: '789 Pine Street, House #12, Chicago, IL 60601',
-        instructions: '',
-        chapatiOption: 'C3',
-        chapatiCount: 3,
-        paymentMethod: 'prepaid',
-        totalAmount: 59,
-        orderTime: '2024-01-15 16:45:00',
-        status: 'delivered',
-        menuTitle: "Tonight's YummyFi Dinner Delight!"
-      }
-    ];
-    setOrders(mockOrders);
+    const db = getFirestore(app);
+    const ordersRef = collection(db, 'orders');
+    // Optional: Query to order the results by time
+    const q = query(ordersRef, orderBy('orderTime', 'desc'));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const ordersData = querySnapshot.docs.map(doc => ({
+        id: doc.id, // Firestore document ID
+        ...doc.data()
+      }));
+      setOrders(ordersData);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const updateOrderStatus = (orderId, newStatus) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    ));
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    const db = getFirestore(app);
+    const orderRef = doc(db, 'orders', orderId);
+    try {
+      await updateDoc(orderRef, {
+        status: newStatus
+      });
+    } catch (error) {
+      console.error("Error updating status: ", error);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -72,9 +49,12 @@ const OrdersManagement = () => {
     }
   };
 
-  const formatTime = (timeString) => {
-    return new Date(timeString).toLocaleString();
-  };
+  const formatTime = (time) => {
+  if (time && typeof time.toDate === 'function') {
+    return time.toDate().toLocaleString();
+  }
+  return new Date(time).toLocaleString(); // Fallback for old mock data if needed
+};
 
   return (
     <div className="orders-management">
