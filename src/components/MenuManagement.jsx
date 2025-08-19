@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react'; // FETCH: useEffect is now needed
+import React, { useState, useEffect } from 'react';
 import './MenuManagement.css';
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore"; // FETCH: getDoc is now needed
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// The 'getStorage' and other firebase/storage imports are no longer needed.
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore"; 
 import { app } from '../firebase';
 
 const MenuManagement = () => {
-    // FETCH: The initial state is now null, as we will fetch the real menu.
     const [currentMenu, setCurrentMenu] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // FETCH: Add a loading state
+    const [isLoading, setIsLoading] = useState(true);
 
     const [isEditing, setIsEditing] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [newItem, setNewItem] = useState({ name: '', description: '', emoji: '' });
 
+    // State for the image file remains the same
     const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
 
-    // FETCH: This new useEffect hook fetches the menu when the component loads.
     useEffect(() => {
         const fetchMenu = async () => {
             const db = getFirestore(app);
@@ -26,7 +25,6 @@ const MenuManagement = () => {
             if (docSnap.exists()) {
                 setCurrentMenu(docSnap.data());
             } else {
-                // If no menu exists in the DB, create a default one to edit.
                 console.log("No menu found in database. Starting with a default menu.");
                 setCurrentMenu({
                     title: "Tonight's YummyFi Dinner Delight!",
@@ -34,15 +32,14 @@ const MenuManagement = () => {
                     pricing: { C3: { mrp: 0, special: 0, chapati: 3 }, C4: { mrp: 0, special: 0, chapati: 4 }},
                     deliveryTime: "8:00 PM to 9:00 PM",
                     orderDeadline: "5:00 PM",
-                    coverImage: "/src/assets/cover.jpeg" // Default fallback image
+                    coverImage: "/src/assets/cover.jpeg"
                 });
             }
             setIsLoading(false);
         };
 
         fetchMenu();
-    }, []); // Empty array ensures this runs only once on mount.
-
+    }, []);
 
     const handleImageChange = (e) => {
         if (e.target.files[0]) {
@@ -50,6 +47,7 @@ const MenuManagement = () => {
         }
     };
 
+    // All other state handlers (handleMenuTitleChange, handlePricingChange, etc.) remain exactly the same.
     const handleMenuTitleChange = (e) => {
         setCurrentMenu({ ...currentMenu, title: e.target.value });
     };
@@ -98,28 +96,43 @@ const MenuManagement = () => {
         setCurrentMenu({ ...currentMenu, items: updatedItems });
     };
 
+
     const saveMenu = async () => {
-        // This function's logic remains the same, it will save the current state to Firebase.
         const db = getFirestore(app);
         const menuRef = doc(db, 'menu', 'todaysMenu');
         let menuDataToSave = { ...currentMenu };
 
+        // UPDATED: This block now uploads the image to your Vercel Blob API endpoint.
         if (imageFile) {
             setIsUploading(true);
-            const storage = getStorage(app);
-            const imageRef = ref(storage, `menu-images/${Date.now()}_${imageFile.name}`);
+            const formData = new FormData();
+            formData.append('file', imageFile);
+
             try {
-                await uploadBytes(imageRef, imageFile);
-                const downloadURL = await getDownloadURL(imageRef);
-                menuDataToSave.coverImage = downloadURL;
+                // Send the file to your own serverless function
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+                
+                const blob = await response.json();
+                
+                // The blob object returned from your API contains the public URL
+                menuDataToSave.coverImage = blob.url;
+
             } catch (error) {
                 console.error("Error uploading image: ", error);
                 alert('Image upload failed! Menu saved without new image.');
                 setIsUploading(false);
-                return;
+                return; // Stop the function if upload fails
             }
         }
 
+        // This part, which saves the final menu data to Firestore, remains unchanged.
         try {
             await setDoc(menuRef, menuDataToSave);
             alert('Menu saved successfully!');
@@ -133,14 +146,14 @@ const MenuManagement = () => {
         }
     };
 
-    // FETCH: Add a loading state check before rendering anything.
     if (isLoading) {
         return <div>Loading menu for editing...</div>;
     }
 
+    // The entire JSX for rendering the component remains the same.
     return (
         <div className="menu-management">
-            <div className="menu-header">
+             <div className="menu-header">
                 <h2>Menu Management</h2>
                 <div className="menu-actions">
                     {!isEditing ? (
@@ -150,7 +163,7 @@ const MenuManagement = () => {
                     ) : (
                         <div className="edit-actions">
                             <button className="save-btn" onClick={saveMenu} disabled={isUploading}>
-                                {isUploading ? 'Uploading Image...' : '💾 Save Changes'}
+                                {isUploading ? 'Uploading...' : '💾 Save Changes'}
                             </button>
                             <button className="cancel-btn" onClick={() => setIsEditing(false)}>
                                 ❌ Cancel
