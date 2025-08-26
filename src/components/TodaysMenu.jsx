@@ -93,14 +93,14 @@ const TodaysMenu = () => {
 
           <div className="pricing-section">
             <h3>💰 Pricing Options</h3>
-            <div className="price-preview">
-              <div className="price-option-preview">
-                {todaysItem.pricing?.map((opt, index) => (
-                  <div key={index} className="price-details">
-                    <span>{opt.name}: <span className="mrp">₹{opt.mrp}</span> <span className="special-price">₹{opt.special}</span></span>
-                  </div>
-                ))}
-              </div>
+            <div className="price-options-container">
+              {todaysItem.pricing?.map((opt, index) => (
+                <div key={index} className="price-card">
+                  <div className="price-card-name">{opt.name}</div>
+                  <div className="price-card-mrp">MRP: ₹{opt.mrp}</div>
+                  <div className="price-card-special">Special: ₹{opt.special}</div>
+                </div>
+              ))}
             </div>
           </div>
 

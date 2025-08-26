@@ -244,3 +244,45 @@
     height: 200px;
   }
 }
+
+.price-options-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.price-card {
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  min-width: 150px;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease-in-out;
+}
+
+.price-card:hover {
+  border-color: #667eea;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+.price-card-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.price-card-mrp {
+  font-size: 0.9rem;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.price-card-special {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #667eea;
+}
