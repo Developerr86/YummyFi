@@ -1,40 +1,54 @@
+import React, { useState, useEffect } from 'react';
 import OrderModal from './OrderModal';
+import './TodaysMenu.css';
 import { getFirestore, doc, onSnapshot } from "firebase/firestore";
 import { app } from '../firebase';
-import React, { useState, useEffect } from 'react';
-import './TodaysMenu.css';
 
 const TodaysMenu = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-  // REPLACE the hardcoded 'todaysItem' object with this state:
   const [todaysItem, setTodaysItem] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ADD this useEffect to fetch the menu data
   useEffect(() => {
     const db = getFirestore(app);
-    const menuRef = doc(db, 'menu', 'todaysMenu');
+    const liveStatusRef = doc(db, "status", "liveMenu");
 
-    // onSnapshot listens for real-time changes
-    const unsubscribe = onSnapshot(menuRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setTodaysItem(docSnap.data());
+    // Listen for changes to the liveMenu document.
+    // This outer subscription will run whenever a new menu is published.
+    const unsubscribeLiveStatus = onSnapshot(liveStatusRef, (statusDoc) => {
+      if (statusDoc.exists()) {
+        const liveMenuId = statusDoc.data().activeMenuId;
+        
+        if (liveMenuId) {
+          // Now that we have the ID, we create a second subscription
+          // to fetch the actual menu document.
+          const menuRef = doc(db, "menus", liveMenuId);
+          const unsubscribeMenu = onSnapshot(menuRef, (menuDoc) => {
+            if (menuDoc.exists()) {
+              setTodaysItem(menuDoc.data());
+            } else {
+              setTodaysItem(null); // The live menu ID points to a deleted menu
+            }
+            setLoading(false);
+          });
+          // Return the cleanup function for the *inner* subscription
+          return () => unsubscribeMenu();
+        }
       } else {
-        console.log("Today's menu document does not exist!");
-        // Handle the case where the menu hasn't been set by the admin yet
+        // The status/liveMenu document doesn't exist at all
         setTodaysItem(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    // Return the cleanup function for the *outer* subscription
+    return () => unsubscribeLiveStatus();
   }, []);
 
   const handleOrder = () => {
     setIsOrderModalOpen(true);
   };
 
-  // Add a loading state for a better user experience
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2rem' }}>
@@ -43,7 +57,6 @@ const TodaysMenu = () => {
     );
   }
 
-  // Add a check in case the menu doesn't exist
   if (!todaysItem) {
     return (
       <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2rem' }}>
@@ -82,11 +95,11 @@ const TodaysMenu = () => {
             <h3>💰 Pricing Options</h3>
             <div className="price-preview">
               <div className="price-option-preview">
-                <div className="price-details">
-                  <span className="mrp">MRP: ₹70-80</span>
-                  <span className="special-price">Special Price: ₹59-63</span>
-                  <span className="chapati-info">(Choose chapati option when ordering)</span>
-                </div>
+                {todaysItem.pricing?.map((opt, index) => (
+                  <div key={index} className="price-details">
+                    <span>{opt.name}: <span className="mrp">₹{opt.mrp}</span> <span className="special-price">₹{opt.special}</span></span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -94,14 +107,18 @@ const TodaysMenu = () => {
           <div className="payment-info">
             <h3>💳 Payment Options</h3>
             <div className="payment-options">
-              <div className="payment-option">
-                <span className="check">✅</span>
-                <span>Prepaid – No extra charges</span>
-              </div>
-              <div className="payment-option">
-                <span className="check">✅</span>
-                <span>COD – ₹5 extra per parcel</span>
-              </div>
+              {todaysItem.paymentOptions?.prepaid && (
+                <div className="payment-option">
+                  <span className="check">✅</span>
+                  <span>Prepaid – No extra charges</span>
+                </div>
+              )}
+              {todaysItem.paymentOptions?.cod && (
+                <div className="payment-option">
+                  <span className="check">✅</span>
+                  <span>COD – ₹5 extra per parcel</span>
+                </div>
+              )}
             </div>
           </div>
 

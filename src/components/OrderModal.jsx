@@ -11,7 +11,8 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
   const [orderDetails, setOrderDetails] = useState({
     address: '',
     instructions: '',
-    chapatiOption: 'C3',
+    // Set the default to the name of the first pricing option
+    chapatiOption: itemData?.pricing?.[0]?.name || '', 
     paymentMethod: 'prepaid'
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -63,10 +64,10 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
 
   if (!isOpen) return null;
 
-  const selectedPrice = itemData?.pricing[orderDetails.chapatiOption];
+  const selectedPriceOption = itemData?.pricing.find(p => p.name === orderDetails.chapatiOption);
   const codFee = orderDetails.paymentMethod === 'cod' ? 5 : 0;
-  const totalPrice = selectedPrice ? selectedPrice.special + codFee : 0;
-
+  const totalPrice = selectedPriceOption ? selectedPriceOption.special + codFee : 0;
+  
   if (showConfirmation) {
     return (
       <div className="modal-overlay">
@@ -141,17 +142,17 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
             <div className="form-section">
               <h3>🍞 Chapati Option</h3>
               <div className="chapati-options">
-                {Object.entries(itemData?.pricing || {}).map(([key, option]) => (
-                  <label key={key} className="chapati-option">
+                {itemData?.pricing?.map((option, index) => (
+                  <label key={index} className="chapati-option">
                     <input
                       type="radio"
                       name="chapatiOption"
-                      value={key}
-                      checked={orderDetails.chapatiOption === key}
+                      value={option.name}
+                      checked={orderDetails.chapatiOption === option.name}
                       onChange={handleInputChange}
                     />
                     <div className="option-details">
-                      <span className="option-name">{key} - {option.chapati} Chapati</span>
+                      <span className="option-name">{option.name}</span>
                       <div className="option-pricing">
                         <span className="mrp">MRP: ₹{option.mrp}</span>
                         <span className="special">Special: ₹{option.special}</span>
@@ -165,33 +166,32 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
             <div className="form-section">
               <h3>💳 Payment Method</h3>
               <div className="payment-options">
-                <label className="payment-option">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="prepaid"
-                    checked={orderDetails.paymentMethod === 'prepaid'}
-                    onChange={handleInputChange}
-                  />
-                  <div className="payment-details">
-                    <span className="payment-name">✅ Prepaid</span>
-                    <span className="payment-desc">No extra charges</span>
-                  </div>
-                </label>
-                <label className="payment-option">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="cod"
-                    checked={orderDetails.paymentMethod === 'cod'}
-                    onChange={handleInputChange}
-                  />
-                  <div className="payment-details">
-                    <span className="payment-name">✅ Cash on Delivery</span>
-                    <span className="payment-desc">₹5 extra per parcel</span>
-                  </div>
-                </label>
+                {itemData.paymentOptions?.prepaid && (
+                  <label className="payment-option">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="prepaid"
+                      checked={orderDetails.paymentMethod === 'prepaid'}
+                      onChange={handleInputChange}
+                    />
+                    {/* ... details ... */}
+                  </label>
+                )}
+                {itemData.paymentOptions?.cod && (
+                  <label className="payment-option">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={orderDetails.paymentMethod === 'cod'}
+                      onChange={handleInputChange}
+                    />
+                    {/* ... details ... */}
+                  </label>
+                )}
               </div>
+
             </div>
 
             <div className="order-total">

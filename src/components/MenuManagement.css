@@ -367,3 +367,92 @@
     min-width: auto;
   }
 }
+
+/* In src/components/MenuManagement.css */
+
+.menu-list {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.menu-list-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e1e5e9;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.menu-list-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.menu-list-item.live {
+  border-color: #28a745;
+  box-shadow: 0 0 15px rgba(40, 167, 69, 0.2);
+}
+
+.menu-list-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.menu-info {
+  flex-grow: 1;
+  color: #333; /* This fixes the invisible text issue */
+}
+
+.menu-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+}
+
+.menu-item-preview {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+}
+
+.menu-list-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.menu-item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.set-live-btn {
+  background: #20c997;
+  color: white;
+  border: none;
+}
+.set-live-btn:disabled {
+  background: #28a745;
+  cursor: default;
+}
+
+/* NEW styles for the MenuForm component */
+.menu-form-container {
+  padding: 30px;
+}
+.payment-toggles {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.payment-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
