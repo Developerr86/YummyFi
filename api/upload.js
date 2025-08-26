@@ -1,9 +1,5 @@
 import { put } from '@vercel/blob';
 
-// This config is crucial for Vercel to run the function in the correct environment.
-export const config = {
-  runtime: 'edge',
-};
 
 export default async function (request) {
   const form = await request.formData();
