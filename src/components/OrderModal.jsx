@@ -15,27 +15,27 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  // This effect ensures we set a valid default selection when the modal opens
+  // This effect sets a valid default selection when the modal opens or the item data changes
   useEffect(() => {
-    if (itemData?.pricing?.[0]) {
+    if (isOpen && itemData?.pricing?.[0]) {
       setOrderDetails(prev => ({
         ...prev,
-        chapatiOption: itemData.pricing[0].name
+        chapatiOption: itemData.pricing[0].name,
+        // Set a default payment method based on what's available
+        paymentMethod: itemData.paymentOptions?.prepaid ? 'prepaid' : 'cod'
       }));
     }
   }, [isOpen, itemData]);
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setOrderDetails(prev => ({ ...prev, [name]: value }));
   };
 
-  // FIX: This is the corrected price calculation logic
+  // Correct price calculation logic
   const selectedPriceOption = itemData?.pricing?.find(p => p.name === orderDetails.chapatiOption);
   const codFee = orderDetails.paymentMethod === 'cod' ? 5 : 0;
   const totalPrice = selectedPriceOption ? Number(selectedPriceOption.special) + codFee : 0;
-
 
   const handleConfirmOrder = async () => {
     if (!orderDetails.address.trim()) {
@@ -53,9 +53,9 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
         ...orderDetails,
         userId: user.uid,
         userEmail: user.email,
-        orderTime: serverTimestamp(), // Use the server's timestamp
+        orderTime: serverTimestamp(),
         status: 'pending',
-        totalAmount: totalPrice, // Use the correctly calculated totalPrice
+        totalAmount: totalPrice,
         menuTitle: itemData.title
       });
       setShowConfirmation(true);
@@ -68,112 +68,164 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);
     onClose();
-    setOrderDetails({
-      address: '',
-      instructions: '',
-      chapatiOption: itemData?.pricing?.[0]?.name || '',
-      paymentMethod: 'prepaid'
-    });
   };
 
   if (!isOpen) return null;
 
-  // The rest of your component's JSX
-  // It will now use the corrected `totalPrice` and `selectedPriceOption` variables
-  // ...
-  // For example, in the confirmation modal:
-  // <p><strong>Chapati:</strong> {orderDetails.chapatiOption} ({selectedPriceOption?.name})</p>
-  // <p><strong>Total:</strong> ₹{totalPrice}</p>
-  
-  return (
+  if (showConfirmation) {
+    return (
       <div className="modal-overlay">
-          {/* ... The rest of your JSX is here ... */}
-          {/* Make sure the radio buttons and price display use the new logic */}
+        <div className="confirmation-modal">
+          <div className="confirmation-content">
+            <div className="success-icon">\u2705</div>
+            <h2>Order Confirmed!</h2>
+            <p>Thank you! Your delicious meal is on its way.</p>
+            <div className="order-summary">
+              <h3>Order Details:</h3>
+              <p><strong>Menu:</strong> {itemData?.title}</p>
+              <p><strong>Option:</strong> {orderDetails.chapatiOption}</p>
+              <p><strong>Payment:</strong> {orderDetails.paymentMethod === 'prepaid' ? 'Prepaid' : 'Cash on Delivery'}</p>
+              <p><strong>Total:</strong> \u20b9{totalPrice}</p>
+              <p><strong>Delivery:</strong> {itemData?.deliveryTime}</p>
+            </div>
+            <button className="close-confirmation-btn" onClick={handleCloseConfirmation}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* This is the part for chapati options */}
-          <div className="chapati-options">
-              {itemData?.pricing?.map((option, index) => (
-                  <label key={index} className="chapati-option">
-                      <input
-                          type="radio"
-                          name="chapatiOption"
-                          value={option.name}
-                          checked={orderDetails.chapatiOption === option.name}
-                          onChange={handleInputChange}
-                      />
-                      <div className="option-details">
-                          <span className="option-name">{option.name}</span>
-                          <div className="option-pricing">
-                              <span className="mrp">MRP: ₹{option.mrp}</span>
-                              <span className="special">Special: ₹{option.special}</span>
-                          </div>
-                      </div>
-                  </label>
-              ))}
+  return (
+    <div className="modal-overlay">
+      <div className="order-modal">
+        <div className="modal-header">
+          <h2>Complete Your Order</h2>
+          <button className="close-btn" onClick={onClose}>�</button>
+        </div>
+
+        <div className="modal-content">
+          <div className="order-item-summary">
+            <h3>{itemData?.title} </h3>
           </div>
 
-          {/* This is the part for payment options */}
-          <div className="payment-options">
-              {itemData.paymentOptions?.prepaid && (
-                  <label className="payment-option">
-                      <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="prepaid"
-                          checked={orderDetails.paymentMethod === 'prepaid'}
-                          onChange={handleInputChange}
-                      />
-                      <div className="payment-details">
-                        <span className="payment-name">✅ Prepaid</span>
-                        <span className="payment-desc">No extra charges</span>
-                      </div>
-                  </label>
-              )}
-              {itemData.paymentOptions?.cod && (
-                  <label className="payment-option">
-                      <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="cod"
-                          checked={orderDetails.paymentMethod === 'cod'}
-                          onChange={handleInputChange}
-                      />
-                      <div className="payment-details">
-                          <span className="payment-name">✅ Cash on Delivery</span>
-                          <span className="payment-desc">₹5 extra per parcel</span>
-                      </div>
-                  </label>
-              )}
-          </div>
+          <form className="order-form">
+            <div className="form-section">
+              <h3> Delivery Address</h3>
+              <textarea
+                name="address"
+                value={orderDetails.address}
+                onChange={handleInputChange}
+                placeholder="Enter your complete delivery address..."
+                className="address-input"
+                rows="3"
+                required
+              />
+            </div>
 
-          {/* This is the part for the total */}
-          <div className="order-total">
-            <div className="total-breakdown">
+            <div className="form-section">
+              <h3> Delivery Instructions (Optional)</h3>
+              <textarea
+                name="instructions"
+                value={orderDetails.instructions}
+                onChange={handleInputChange}
+                placeholder="Any special instructions..."
+                className="instructions-input"
+                rows="2"
+              />
+            </div>
+
+            <div className="form-section">
+              <h3> Select Your Option</h3>
+              <div className="option-selector">
+                {itemData?.pricing?.map((option, index) => (
+                  <label key={index} className={`selectable-card ${orderDetails.chapatiOption === option.name ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="chapatiOption"
+                      value={option.name}
+                      checked={orderDetails.chapatiOption === option.name}
+                      onChange={handleInputChange}
+                    />
+                    <div className="option-details">
+                      <span className="option-name">{option.name}</span>
+                      <div className="option-pricing">
+                        <span className="mrp">MRP: {option.mrp}</span>
+                        <span className="special">Special: {option.special}</span>
+                      </div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h3>Payment Method</h3>
+              <div className="option-selector">
+                {itemData.paymentOptions?.prepaid && (
+                  <label className={`selectable-card ${orderDetails.paymentMethod === 'prepaid' ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="prepaid"
+                      checked={orderDetails.paymentMethod === 'prepaid'}
+                      onChange={handleInputChange}
+                    />
+                    <div className="payment-details">
+                      <span className="payment-name"> Prepaid</span>
+                      <span className="payment-desc">No extra charges</span>
+                    </div>
+                  </label>
+                )}
+                {itemData.paymentOptions?.cod && (
+                  <label className={`selectable-card ${orderDetails.paymentMethod === 'cod' ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={orderDetails.paymentMethod === 'cod'}
+                      onChange={handleInputChange}
+                    />
+                    <div className="payment-details">
+                      <span className="payment-name">Cash on Delivery</span>
+                      <span className="payment-desc">extra per parcel</span>
+                    </div>
+                  </label>
+                )}
+              </div>
+            </div>
+
+            <div className="order-total">
+              <div className="total-breakdown">
                 <div className="total-row">
-                    <span>Item Price:</span>
-                    <span>₹{selectedPriceOption?.special || 0}</span>
+                  <span>Item Price:</span>
+                  <span>{selectedPriceOption?.special || 0}</span>
                 </div>
                 {codFee > 0 && (
                   <div className="total-row">
                     <span>COD Fee:</span>
-                    <span>₹{codFee}</span>
+                    <span>{codFee}</span>
                   </div>
                 )}
                 <div className="total-row final-total">
-                    <span>Total Amount:</span>
-                    <span>₹{totalPrice}</span>
+                  <span>Total Amount:</span>
+                  <span>{totalPrice}</span>
                 </div>
+              </div>
             </div>
-        </div>
 
-        <button 
-          type="button" 
-          className="confirm-order-btn"
-          onClick={handleConfirmOrder}
-        >
-          Confirm Order - ₹{totalPrice}
-        </button>
+            <button 
+              type="button" 
+              className="confirm-order-btn"
+              onClick={handleConfirmOrder}
+            >
+              Confirm Order - {totalPrice}
+            </button>
+          </form>
+        </div>
       </div>
+    </div>
   );
 };
 

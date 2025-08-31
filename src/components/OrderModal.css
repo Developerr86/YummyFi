@@ -371,3 +371,41 @@
     padding: 30px 20px;
   }
 }
+
+/* In src/components/OrderModal.css */
+
+.option-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.selectable-card {
+  position: relative;
+  padding: 15px 20px;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.selectable-card:hover {
+  border-color: #764ba2;
+}
+
+/* This hides the actual radio button */
+.selectable-card input[type="radio"] {
+  display: none;
+}
+
+/* This styles the card when its hidden radio button is selected */
+.selectable-card input[type="radio"]:checked + div {
+  /* No direct style needed here, we'll style the label itself */
+}
+
+/* We target the label when the input inside it is checked */
+.selectable-card input[type="radio"]:checked {
+  border-color: #667eea;
+  background-color: #f0f2ff;
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
