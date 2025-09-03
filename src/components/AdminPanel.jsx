@@ -8,12 +8,15 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('orders');
   const { user, logout } = useAuth();
 
+  console.log('--- AdminPanel Component Rendered. User object is: ---', user);
+
   return (
     <div className="admin-panel">
       <div className="admin-header">
         <div className="admin-header-top">
           <h1>YummyFi Admin Panel</h1>
           <div className="admin-user-info">
+            {/* Display user's name if it exists, otherwise their email */}
             <span>Welcome, {user?.name || user?.email}!</span>
             <button onClick={logout} className="admin-logout-btn">Logout</button>
           </div>

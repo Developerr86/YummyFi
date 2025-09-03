@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { app } from '../firebase';
 
@@ -19,20 +19,22 @@ export const AuthProvider = ({ children }) => {
   const auth = getAuth(app);
   
   useEffect(() => {
-    
     const db = getFirestore(app);
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser){
+      if (currentUser) {
+        // When auth state changes, fetch the user's custom data (like role) from Firestore.
         const userDocRef = doc(db, "users", currentUser.uid);
         const userDoc = await getDoc(userDocRef);
       
-        if (userDoc.exists()){
+        if (userDoc.exists()) {
+          // Combine the auth data with the Firestore document data.
           setUser({
             ...currentUser,
             ...userDoc.data()
           });
         } else {
+          // Fallback in case the user doc doesn't exist yet.
           setUser(currentUser);
         }
       } else {
@@ -42,7 +44,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
 
   const login = async (email, password) => {
     try {
@@ -55,13 +57,13 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (email, password, name) => {
     try {
-      // We will need to create the user doc here as well.
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const db = getFirestore(app);
+      // Create a document in the 'users' collection with the user's details.
       await setDoc(doc(db, "users", userCredential.user.uid), {
           name: name,
           email: email,
-          role: 'user' // Set a default role on signup
+          role: 'user' // All new signups default to the 'user' role.
       });
       return { success: true };
     } catch (error) {
@@ -70,7 +72,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    return signOut(auth)
+    return signOut(auth);
   };
 
   const value = {

@@ -10,28 +10,26 @@ const OrdersManagement = () => {
   useEffect(() => {
     const db = getFirestore(app);
     const ordersRef = collection(db, 'orders');
-    // Optional: Query to order the results by time
     const q = query(ordersRef, orderBy('orderTime', 'desc'));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const ordersData = querySnapshot.docs.map(doc => ({
-        id: doc.id, // Firestore document ID
+        id: doc.id,
         ...doc.data()
       }));
+
+      console.log('--- Firestore returned orders: ---', ordersData);
       setOrders(ordersData);
     });
 
     return () => unsubscribe();
   }, []);
 
-
   const updateOrderStatus = async (orderId, newStatus) => {
     const db = getFirestore(app);
     const orderRef = doc(db, 'orders', orderId);
     try {
-      await updateDoc(orderRef, {
-        status: newStatus
-      });
+      await updateDoc(orderRef, { status: newStatus });
     } catch (error) {
       console.error("Error updating status: ", error);
     }
@@ -50,11 +48,11 @@ const OrdersManagement = () => {
   };
 
   const formatTime = (time) => {
-  if (time && typeof time.toDate === 'function') {
-    return time.toDate().toLocaleString();
-  }
-  return new Date(time).toLocaleString(); // Fallback for old mock data if needed
-};
+    if (time && typeof time.toDate === 'function') {
+      return time.toDate().toLocaleString();
+    }
+    return new Date(time).toLocaleString();
+  };
 
   return (
     <div className="orders-management">
@@ -90,8 +88,8 @@ const OrdersManagement = () => {
             >
               <div className="order-header">
                 <div className="order-info">
-                  <h3>{order.customerName}</h3>
-                  <p className="order-email">{order.customerEmail}</p>
+                  <h3>{order.customerName || order.userEmail}</h3>
+                  <p className="order-email">{order.userEmail}</p>
                   <p className="order-time">{formatTime(order.orderTime)}</p>
                 </div>
                 <div className="order-status">
@@ -115,20 +113,17 @@ const OrdersManagement = () => {
         {selectedOrder && (
           <div className="order-details">
             <div className="details-header">
-              <h3>Order Details - #{selectedOrder.id}</h3>
-              <button 
-                className="close-details"
-                onClick={() => setSelectedOrder(null)}
-              >
-                ×
-              </button>
+              <h3>Order Details - #{selectedOrder.id.substring(0, 7)}</h3>
+              <button className="close-details" onClick={() => setSelectedOrder(null)}>×</button>
             </div>
 
             <div className="details-content">
-              <div className="detail-section">
+               <div className="detail-section">
                 <h4>Customer Information</h4>
-                <p><strong>Name:</strong> {selectedOrder.customerName}</p>
-                <p><strong>Email:</strong> {selectedOrder.customerEmail}</p>
+                {/* CORRECTED: Use customerName with a fallback to userEmail */}
+                <p><strong>Name:</strong> {selectedOrder.customerName || selectedOrder.userEmail}</p>
+                {/* CORRECTED: Use the correct field 'userEmail' */}
+                <p><strong>Email:</strong> {selectedOrder.userEmail}</p>
                 <p><strong>Order Time:</strong> {formatTime(selectedOrder.orderTime)}</p>
               </div>
 

@@ -2,23 +2,20 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
-// Import new components
 import UserLayout from "./components/UserLayout";
 import MyOrders from "./components/MyOrders";
-
 import Auth from "./components/Auth";
 import Home from "./components/Home";
 import AdminPanel from "./components/AdminPanel";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
-// Placeholder for the My Account page
-const MyAccount = () => <div style={{padding: '20px'}}><h2>My Account</h2><p>This page is under construction.</p></div>;
+const MyAccount = () => <div style={{padding: '20px', color:'black'}}><h2>My Account</h2><p>This page is under construction.</p></div>;
 
 function AppRoutes() {
   const { user } = useAuth();
 
-  // Redirect logic for the root path
+  // This check is important: if a logged-in user is an admin, always send them to the admin panel.
   if (user && user.role === 'admin') {
       return <Navigate to="/admin" replace />;
   }

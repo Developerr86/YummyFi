@@ -3,27 +3,21 @@ import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/fire
 import { app } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import './OrderModal.css';
-// Step 1: Import your QR code image
 import upiQrCode from '../assets/upi-qr-code.jpeg'; 
 
 const OrderModal = ({ isOpen, onClose, itemData }) => {
   const { user } = useAuth();
+  const [orderDetails, setOrderDetails] = useState({});
+  const [view, setView] = useState('form');
 
-  const [orderDetails, setOrderDetails] = useState({ /* ... your existing state ... */ });
-  
-  // Step 2: Replace 'showConfirmation' with a more powerful view manager
-  const [view, setView] = useState('form'); // 'form', 'qrCode', or 'confirmation'
-
-  // This useEffect logic remains the same
   useEffect(() => {
     if (isOpen && itemData?.pricing?.[0]) {
-      setOrderDetails(prev => ({
-        ...prev,
+      setOrderDetails({
         address: '',
         instructions: '',
         chapatiOption: itemData.pricing[0].name,
         paymentMethod: itemData.paymentOptions?.prepaid ? 'prepaid' : 'cod'
-      }));
+      });
     }
   }, [isOpen, itemData]);
 
@@ -37,30 +31,28 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
   const totalPrice = selectedPriceOption ? Number(selectedPriceOption.special) + codFee : 0;
 
   const handleConfirmOrder = async () => {
-    // Validation remains the same
     if (!orderDetails.address.trim()) {
       alert('Please enter your delivery address');
       return;
     }
     
-    // Save the order to Firestore first, regardless of payment method
     const db = getFirestore(app);
     try {
       await addDoc(collection(db, 'orders'), {
         ...orderDetails,
         userId: user.uid,
         userEmail: user.email,
+        customerName: user.name || user.email, // Use name, fallback to email
         orderTime: serverTimestamp(),
-        status: 'pending', // All orders start as pending
+        status: 'pending',
         totalAmount: totalPrice,
         menuTitle: itemData.title
       });
 
-      // Step 3: Change the view based on the payment method
       if (orderDetails.paymentMethod === 'prepaid') {
-        setView('qrCode'); // Show QR code for prepaid
+        setView('qrCode');
       } else {
-        setView('confirmation'); // Go straight to confirmation for COD
+        setView('confirmation');
       }
     } catch (error) {
       console.error("Error placing order: ", error);
@@ -69,7 +61,7 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
   };
 
   const handleClose = () => {
-    setView('form'); // Reset the view to the form
+    setView('form');
     onClose();
   };
 
