@@ -13,43 +13,39 @@ const MenuForm = ({ menuData, onSave, onCancel }) => {
         setMenu(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    // --- Item Handlers ---
     const handleItemChange = (index, field, value) => {
         const newItems = menu.items.map((item, i) => i === index ? { ...item, [field]: value } : item);
         setMenu(prev => ({ ...prev, items: newItems }));
     };
+
     const addItem = () => {
         setMenu(prev => ({ ...prev, items: [...prev.items, { name: '', description: '', emoji: '' }] }));
     };
+
     const removeItem = (index) => {
         setMenu(prev => ({ ...prev, items: prev.items.filter((_, i) => i !== index) }));
     };
 
-    // --- NEW: Pricing Handlers ---
     const handlePricingChange = (index, field, value) => {
         const newPricing = menu.pricing.map((p, i) => i === index ? { ...p, [field]: value } : p);
         setMenu(prev => ({ ...prev, pricing: newPricing }));
     };
+
     const addPricingOption = () => {
         setMenu(prev => ({ ...prev, pricing: [...prev.pricing, { name: '', mrp: 0, special: 0 }] }));
     };
+
     const removePricingOption = (index) => {
         setMenu(prev => ({ ...prev, pricing: prev.pricing.filter((_, i) => i !== index) }));
     };
 
-    // --- NEW: Payment Option Handler ---
     const handlePaymentToggle = (method) => {
         setMenu(prev => ({
             ...prev,
-            paymentOptions: {
-                ...prev.paymentOptions,
-                [method]: !prev.paymentOptions[method]
-            }
+            paymentOptions: { ...prev.paymentOptions, [method]: !prev.paymentOptions[method] }
         }));
     };
-    
-    // This function for saving the menu is now in the parent component.
-    // We pass the final state up to be saved.
+
     const handleSave = async () => {
         let finalMenuData = { ...menu };
         
@@ -57,7 +53,6 @@ const MenuForm = ({ menuData, onSave, onCancel }) => {
             setIsUploading(true);
             const formData = new FormData();
             formData.append('file', imageFile);
-
             try {
                 const baseUrl = import.meta.env.DEV ? 'http://localhost:3000' : '';
                 const response = await fetch(`${baseUrl}/api/upload`, { method: 'POST', body: formData });
@@ -77,28 +72,19 @@ const MenuForm = ({ menuData, onSave, onCancel }) => {
 
     return (
         <div className="menu-form-container">
-            {/* --- General Details Section --- */}
             <div className="form-section">
                 <h3>General Details</h3>
-                <input name="title" value={menu.title} onChange={handleChange} className="title-input" placeholder="Menu Title (e.g., Monday Dinner Special)" />
-                <div className="setting-item">
-                    <label>Order Deadline:</label>
-                    <input name="orderDeadline" value={menu.orderDeadline} onChange={handleChange} />
-                </div>
-                <div className="setting-item">
-                    <label>Delivery Time:</label>
-                    <input name="deliveryTime" value={menu.deliveryTime} onChange={handleChange} />
-                </div>
+                <input name="title" value={menu.title} onChange={handleChange} className="title-input" placeholder="Menu Title (e.g., Monday Dinner)" />
+                <div className="setting-item"><label>Order Deadline:</label><input name="orderDeadline" value={menu.orderDeadline} onChange={handleChange} /></div>
+                <div className="setting-item"><label>Delivery Time:</label><input name="deliveryTime" value={menu.deliveryTime} onChange={handleChange} /></div>
             </div>
 
-            {/* --- Cover Image Section --- */}
             <div className="form-section">
                 <h3>Cover Image</h3>
                 <img src={menu.coverImage} alt="Cover" style={{ width: '150px', marginBottom: '10px', borderRadius: '8px' }} />
                 <input type="file" onChange={(e) => setImageFile(e.target.files[0])} accept="image/*" />
             </div>
 
-            {/* --- Menu Items Section --- */}
             <div className="form-section">
                 <h3>Menu Items</h3>
                 {menu.items.map((item, index) => (
@@ -112,7 +98,6 @@ const MenuForm = ({ menuData, onSave, onCancel }) => {
                 <button onClick={addItem} className="add-btn">+ Add Item</button>
             </div>
 
-            {/* --- NEW: Dynamic Pricing Section --- */}
             <div className="form-section">
                 <h3>Pricing Options</h3>
                 {menu.pricing.map((p, index) => (
@@ -126,18 +111,11 @@ const MenuForm = ({ menuData, onSave, onCancel }) => {
                 <button onClick={addPricingOption} className="add-btn">+ Add Pricing Option</button>
             </div>
 
-            {/* --- NEW: Payment Options Section --- */}
             <div className="form-section">
                 <h3>Payment Options</h3>
                 <div className="payment-toggles">
-                    <label>
-                        <input type="checkbox" checked={menu.paymentOptions.prepaid} onChange={() => handlePaymentToggle('prepaid')} />
-                        Enable Prepaid
-                    </label>
-                    <label>
-                        <input type="checkbox" checked={menu.paymentOptions.cod} onChange={() => handlePaymentToggle('cod')} />
-                        Enable Cash on Delivery
-                    </label>
+                    <label><input type="checkbox" checked={!!menu.paymentOptions.prepaid} onChange={() => handlePaymentToggle('prepaid')} /> Enable Prepaid</label>
+                    <label><input type="checkbox" checked={!!menu.paymentOptions.cod} onChange={() => handlePaymentToggle('cod')} /> Enable COD</label>
                 </div>
             </div>
 
@@ -148,7 +126,6 @@ const MenuForm = ({ menuData, onSave, onCancel }) => {
         </div>
     );
 };
-
 
 // This is the main component that now acts as a dashboard.
 const MenuManagement = () => {
@@ -167,12 +144,10 @@ const MenuManagement = () => {
             setMenus(menusList);
             setIsLoading(false);
         });
-
         const liveStatusRef = doc(db, "status", "liveMenu");
         const unsubscribeLive = onSnapshot(liveStatusRef, (doc) => {
             if (doc.exists()) setLiveMenuId(doc.data().activeMenuId);
         });
-
         return () => { unsubscribeMenus(); unsubscribeLive(); };
     }, [db]);
 

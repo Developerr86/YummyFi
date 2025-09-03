@@ -1,0 +1,135 @@
+.sidebar {
+    background: #ffffff;
+    border-right: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrollbar during transition */
+    transition: width 0.3s ease-in-out;
+}
+
+.sidebar.open {
+    width: 250px;
+}
+.sidebar.closed {
+    width: 80px;
+}
+
+.sidebar-header {
+    padding: 15px 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.sidebar-toggle h1 {
+    color: #667eea;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.toggle-icon {
+    font-size: 1.5rem;
+    color: #888;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 15px 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    text-decoration: none;
+    color: #495057;
+    font-weight: 500;
+    font-size: 1rem;
+    white-space: nowrap; /* Prevent text from wrapping */
+    transition: background-color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    background-color: #f8f9fa;
+}
+
+.nav-link.active {
+    background-color: #667eea;
+    color: white;
+}
+.sidebar.closed .nav-link.active {
+    background-color: #e9ecef;
+    color: #667eea;
+}
+
+
+.nav-icon {
+    font-size: 1.4rem;
+}
+
+/* Hide text when sidebar is closed */
+.sidebar.closed .nav-text {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    transition: opacity 0.1s;
+}
+
+.sidebar-footer {
+    padding: 15px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0; /* Prevent shrinking when closed */
+}
+
+.logout-button {
+    width: 100%;
+    background: #f8f9fa;
+    color: #dc3545;
+    border: 1px solid #f1b0b7;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.sidebar.closed .logout-button {
+    justify-content: center;
+}

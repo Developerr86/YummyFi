@@ -3,25 +3,25 @@ import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/fire
 import { app } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import './OrderModal.css';
+// Step 1: Import your QR code image
+import upiQrCode from '../assets/upi-qr-code.jpeg'; 
 
 const OrderModal = ({ isOpen, onClose, itemData }) => {
   const { user } = useAuth();
 
-  const [orderDetails, setOrderDetails] = useState({
-    address: '',
-    instructions: '',
-    chapatiOption: '', // Start with an empty selection
-    paymentMethod: 'prepaid'
-  });
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [orderDetails, setOrderDetails] = useState({ /* ... your existing state ... */ });
+  
+  // Step 2: Replace 'showConfirmation' with a more powerful view manager
+  const [view, setView] = useState('form'); // 'form', 'qrCode', or 'confirmation'
 
-  // This effect sets a valid default selection when the modal opens or the item data changes
+  // This useEffect logic remains the same
   useEffect(() => {
     if (isOpen && itemData?.pricing?.[0]) {
       setOrderDetails(prev => ({
         ...prev,
+        address: '',
+        instructions: '',
         chapatiOption: itemData.pricing[0].name,
-        // Set a default payment method based on what's available
         paymentMethod: itemData.paymentOptions?.prepaid ? 'prepaid' : 'cod'
       }));
     }
@@ -32,21 +32,18 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
     setOrderDetails(prev => ({ ...prev, [name]: value }));
   };
 
-  // Correct price calculation logic
   const selectedPriceOption = itemData?.pricing?.find(p => p.name === orderDetails.chapatiOption);
   const codFee = orderDetails.paymentMethod === 'cod' ? 5 : 0;
   const totalPrice = selectedPriceOption ? Number(selectedPriceOption.special) + codFee : 0;
 
   const handleConfirmOrder = async () => {
+    // Validation remains the same
     if (!orderDetails.address.trim()) {
       alert('Please enter your delivery address');
       return;
     }
-    if (!orderDetails.chapatiOption) {
-      alert('Please select a pricing option.');
-      return;
-    }
-
+    
+    // Save the order to Firestore first, regardless of payment method
     const db = getFirestore(app);
     try {
       await addDoc(collection(db, 'orders'), {
@@ -54,41 +51,64 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
         userId: user.uid,
         userEmail: user.email,
         orderTime: serverTimestamp(),
-        status: 'pending',
+        status: 'pending', // All orders start as pending
         totalAmount: totalPrice,
         menuTitle: itemData.title
       });
-      setShowConfirmation(true);
-    } catch (error)      {
+
+      // Step 3: Change the view based on the payment method
+      if (orderDetails.paymentMethod === 'prepaid') {
+        setView('qrCode'); // Show QR code for prepaid
+      } else {
+        setView('confirmation'); // Go straight to confirmation for COD
+      }
+    } catch (error) {
       console.error("Error placing order: ", error);
       alert("Could not place your order. Please try again.");
     }
   };
 
-  const handleCloseConfirmation = () => {
-    setShowConfirmation(false);
+  const handleClose = () => {
+    setView('form'); // Reset the view to the form
     onClose();
   };
 
   if (!isOpen) return null;
 
-  if (showConfirmation) {
+  // Step 4: Render the correct view based on the state
+  if (view === 'qrCode') {
     return (
       <div className="modal-overlay">
         <div className="confirmation-modal">
           <div className="confirmation-content">
-            <div className="success-icon">\u2705</div>
-            <h2>Order Confirmed!</h2>
-            <p>Thank you! Your delicious meal is on its way.</p>
+            <h2>Scan to Pay ₹{totalPrice}</h2>
+            <p>Please complete your payment using any UPI app.</p>
+            <img src={upiQrCode} alt="UPI QR Code" style={{ maxWidth: '350px', margin: '20px auto' }} />
+            <button className="close-confirmation-btn" onClick={() => setView('confirmation')}>
+              I have paid
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'confirmation') {
+    return (
+      <div className="modal-overlay">
+        <div className="confirmation-modal">
+          <div className="confirmation-content">
+            <div className="success-icon">👍</div>
+            <h2>Order Placed!</h2>
+            <p>Thank you! Your order has been received and is pending confirmation.</p>
             <div className="order-summary">
               <h3>Order Details:</h3>
               <p><strong>Menu:</strong> {itemData?.title}</p>
               <p><strong>Option:</strong> {orderDetails.chapatiOption}</p>
-              <p><strong>Payment:</strong> {orderDetails.paymentMethod === 'prepaid' ? 'Prepaid' : 'Cash on Delivery'}</p>
-              <p><strong>Total:</strong> \u20b9{totalPrice}</p>
-              <p><strong>Delivery:</strong> {itemData?.deliveryTime}</p>
+              <p><strong>Payment:</strong> {orderDetails.paymentMethod === 'prepaid' ? 'Prepaid (Pending)' : 'Cash on Delivery'}</p>
+              <p><strong>Total:</strong> ₹{totalPrice}</p>
             </div>
-            <button className="close-confirmation-btn" onClick={handleCloseConfirmation}>
+            <button className="close-confirmation-btn" onClick={handleClose}>
               Close
             </button>
           </div>
@@ -102,7 +122,7 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
       <div className="order-modal">
         <div className="modal-header">
           <h2>Complete Your Order</h2>
-          <button className="close-btn" onClick={onClose}>�</button>
+          <button className="close-btn" onClick={handleClose}>x</button>
         </div>
 
         <div className="modal-content">

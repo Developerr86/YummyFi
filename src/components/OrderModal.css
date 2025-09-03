@@ -17,7 +17,7 @@
   border-radius: 20px;
   width: 100%;
   max-width: 600px;
-  max-height: 90vh;
+  max-height: 95vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease-out;
@@ -408,4 +408,79 @@
   border-color: #667eea;
   background-color: #f0f2ff;
   box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+.modal-content .address-input,
+.modal-content .instructions-input {
+  width: calc(100% - 20px); /* Adjust width to account for padding */
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white; /* Make textareas white */
+  color: #333; /* Ensure text is visible */
+  font-size: 1rem;
+  box-sizing: border-box; /* Include padding/border in element's total width/height */
+  resize: vertical; /* Allow vertical resizing, but not horizontal */
+}
+
+/* Optional: Improve placeholder visibility if needed */
+.modal-content .address-input::placeholder,
+.modal-content .instructions-input::placeholder {
+  color: #888;
+}
+
+/* Make the selected card visually distinct */
+.selectable-card.selected {
+  border-color: #667eea; /* A clear indicator color */
+  background-color: #f0f2ff; /* Light background for selected */
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Add some spacing for form sections */
+.form-section {
+  margin-bottom: 25px; /* Add space between sections */
+}
+
+.form-section h3 {
+  margin-bottom: 15px; /* Space below section titles */
+  color: #333; /* Ensure section titles are visible */
+}
+
+/* Adjust header spacing for better layout */
+.modal-header {
+  padding: 15px 25px; /* Consistent padding */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.modal-header .close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Make sure modal content has appropriate padding */
+.modal-content {
+  padding: 25px; /* Add padding inside the modal */
+  overflow-y: auto; /* Allow scrolling if content overflows */
+  max-height: calc(100vh - 120px); /* Adjust based on header/footer size */
+}
+
+/* Ensure other texts are visible */
+.order-item-summary h3 {
+  color: #333; /* Example for text inside summary */
+  margin-bottom: 20px;
 }

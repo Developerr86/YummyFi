@@ -1,0 +1,67 @@
+.my-orders-container {
+    max-width: 900px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.my-orders-container h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-history-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-left: 5px solid #667eea;
+}
+
+.order-history-card.delivered {
+    opacity: 0.6;
+    background-color: #f8f9fa;
+    border-left-color: #6c757d;
+}
+
+.order-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-history-header h4 {
+    color:#000000;
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.order-history-body p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.status-pill {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    text-transform: capitalize;
+}
+
+.status-pill.pending { background-color: #ffc107; }
+.status-pill.confirmed { background-color: #17a2b8; }
+.status-pill.preparing { background-color: #fd7e14; }
+.status-pill.out_for_delivery { background-color: #6f42c1; }
+.status-pill.delivered { background-color: #28a745; }
+.status-pill.cancelled { background-color: #dc3545; }
