@@ -10,34 +10,47 @@ import AdminPanel from "./components/AdminPanel";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
-const MyAccount = () => <div style={{padding: '20px', color:'black'}}><h2>My Account</h2><p>This page is under construction.</p></div>;
+// Placeholder for the My Account page
+const MyAccount = () => <div style={{padding: '20px'}}><h2>My Account</h2><p>This page is under construction.</p></div>;
 
 function AppRoutes() {
   const { user } = useAuth();
 
-  // This check is important: if a logged-in user is an admin, always send them to the admin panel.
-  if (user && user.role === 'admin') {
-      return <Navigate to="/admin" replace />;
-  }
+  // REMOVED the faulty redirect block that was here to prevent the infinite loop.
 
   return (
     <Routes>
-      <Route path="/auth" element={user ? <Navigate to="/" replace /> : <Auth />} />
+      {/* Auth route remains the same */}
+      <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/" replace />} />
 
-      {/* Admin Route */}
-      <Route path="/admin" element={
+      {/* Admin Route is now fully independent */}
+      <Route 
+        path="/admin" 
+        element={
           <ProtectedRoute>
-              {user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/" replace />}
+            {/* This logic correctly ensures only admins see the panel */}
+            {user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/" replace />}
           </ProtectedRoute>
-      } />
+        } 
+      />
 
-      {/* User Routes inside the UserLayout */}
-      <Route path="/" element={<ProtectedRoute><UserLayout /></ProtectedRoute>}>
+      {/* User Routes are wrapped in the UserLayout */}
+      <Route 
+        path="/" 
+        element={
+          <ProtectedRoute>
+            {/* If a logged-in admin tries to visit the user homepage, send them to their panel instead */}
+            {user?.role === 'admin' ? <Navigate to="/admin" replace /> : <UserLayout />}
+          </ProtectedRoute>
+        }
+      >
+          {/* These routes will render inside UserLayout and have the sidebar */}
           <Route index element={<Home />} />
           <Route path="my-orders" element={<MyOrders />} />
           <Route path="account" element={<MyAccount />} />
       </Route>
 
+      {/* A catch-all to redirect any other path to the home page */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
