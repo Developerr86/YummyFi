@@ -1,0 +1,38 @@
+.my-account-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.my-account-container h2 {
+  font-size: 2rem;
+  color: #333;
+}
+
+.account-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.account-card p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.account-logout-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.2s ease;
+}
+
+.account-logout-btn:hover {
+  background: #c82333;
+}

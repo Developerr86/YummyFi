@@ -5,6 +5,12 @@
   overflow: hidden;
 }
 
+input{
+  background-color: #fff;
+  color: #000;
+  border-color: #667eea;
+}
+
 .menu-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -157,6 +163,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  color: #000;
 }
 
 .edit-item-btn:hover {
@@ -455,4 +462,5 @@
   align-items: center;
   gap: 8px;
   font-weight: 500;
+  color: #000;
 }

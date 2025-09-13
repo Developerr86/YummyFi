@@ -33,7 +33,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <div className="sidebar-footer">
                 <div className="user-profile">
                     <div className="user-avatar">{user?.email?.[0].toUpperCase()}</div>
-                    <span className="nav-text">{user?.email}</span>
+                    <span className="nav-text" style={{color: '#000'}}>{user?.email}</span>
                 </div>
                 <button onClick={logout} className="logout-button">
                     <span className="nav-icon">🚪</span>
