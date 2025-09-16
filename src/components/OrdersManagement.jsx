@@ -103,7 +103,7 @@ const OrdersManagement = () => {
                 </div>
               </div>
               <div className="order-summary">
-                <span>{order.chapatiOption} ({order.chapatiCount} Chapati)</span>
+                <span>{order.chapatiOption} (Qty: {order.quantity || 1})</span>
                 <span>{order.paymentMethod === 'prepaid' ? 'Prepaid' : 'COD'}</span>
               </div>
             </div>
@@ -141,7 +141,8 @@ const OrdersManagement = () => {
               <div className="detail-section">
                 <h4>Order Details</h4>
                 <p><strong>Menu:</strong> {selectedOrder.menuTitle}</p>
-                <p><strong>Chapati Option:</strong> {selectedOrder.chapatiOption} ({selectedOrder.chapatiCount} pieces)</p>
+                <p><strong>Option:</strong> {selectedOrder.chapatiOption}</p>
+                <p><strong>Quantity:</strong> {selectedOrder.quantity || 1}</p>
                 <p><strong>Payment Method:</strong> {selectedOrder.paymentMethod === 'prepaid' ? 'Prepaid' : 'Cash on Delivery'}</p>
                 <p><strong>Total Amount:</strong> ₹{selectedOrder.totalAmount}</p>
               </div>

@@ -16,7 +16,8 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
         address: '',
         instructions: '',
         chapatiOption: itemData.pricing[0].name,
-        paymentMethod: itemData.paymentOptions?.prepaid ? 'prepaid' : 'cod'
+        paymentMethod: itemData.paymentOptions?.prepaid ? 'prepaid' : 'cod',
+        quantity: 1
       });
     }
   }, [isOpen, itemData]);
@@ -27,8 +28,18 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
   };
 
   const selectedPriceOption = itemData?.pricing?.find(p => p.name === orderDetails.chapatiOption);
-  const codFee = orderDetails.paymentMethod === 'cod' ? 5 : 0;
-  const totalPrice = selectedPriceOption ? Number(selectedPriceOption.special) + codFee : 0;
+  const codFee = orderDetails.paymentMethod === 'cod' ? 5 * (orderDetails.quantity || 1) : 0;
+  const basePrice = selectedPriceOption ? Number(selectedPriceOption.special) * (orderDetails.quantity || 1) : 0;
+  const totalPrice = basePrice + codFee;
+
+  const handleQuantityChange = (change) => {
+    const currentQuantity = orderDetails.quantity || 1;
+    const newQuantity = currentQuantity + change;
+    
+    if (newQuantity >= 1 && newQuantity <= 15) {
+      setOrderDetails(prev => ({ ...prev, quantity: newQuantity }));
+    }
+  };
 
   const handleConfirmOrder = async () => {
     if (!orderDetails.address.trim()) {
@@ -46,7 +57,8 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
         orderTime: serverTimestamp(),
         status: 'pending',
         totalAmount: totalPrice,
-        menuTitle: itemData.title
+        menuTitle: itemData.title,
+        quantity: orderDetails.quantity || 1
       });
 
       if (orderDetails.paymentMethod === 'prepaid') {
@@ -97,6 +109,7 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
               <h3>Order Details:</h3>
               <p><strong>Menu:</strong> {itemData?.title}</p>
               <p><strong>Option:</strong> {orderDetails.chapatiOption}</p>
+              <p><strong>Quantity:</strong> {orderDetails.quantity || 1}</p>
               <p><strong>Payment:</strong> {orderDetails.paymentMethod === 'prepaid' ? 'Prepaid (Pending)' : 'Cash on Delivery'}</p>
               <p><strong>Total:</strong> ₹{totalPrice}</p>
             </div>
@@ -208,21 +221,45 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
               </div>
             </div>
 
+            <div className="form-section">
+              <h3>Quantity</h3>
+              <div className="quantity-selector">
+                <button 
+                  type="button" 
+                  className="quantity-btn" 
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={orderDetails.quantity <= 1}
+                >
+                  -
+                </button>
+                <span className="quantity-display">{orderDetails.quantity || 1}</span>
+                <button 
+                  type="button" 
+                  className="quantity-btn" 
+                  onClick={() => handleQuantityChange(1)}
+                  disabled={orderDetails.quantity >= 15}
+                >
+                  +
+                </button>
+              </div>
+              <p className="quantity-note">Maximum 15 orders at once</p>
+            </div>
+
             <div className="order-total">
               <div className="total-breakdown">
                 <div className="total-row">
-                  <span>Item Price:</span>
-                  <span>{selectedPriceOption?.special || 0}</span>
+                  <span>Item Price (×{orderDetails.quantity || 1}):</span>
+                  <span>₹{selectedPriceOption?.special || 0} × {orderDetails.quantity || 1} = ₹{basePrice}</span>
                 </div>
                 {codFee > 0 && (
                   <div className="total-row">
-                    <span>COD Fee:</span>
-                    <span>{codFee}</span>
+                    <span>COD Fee (×{orderDetails.quantity || 1}):</span>
+                    <span>₹5 × {orderDetails.quantity || 1} = ₹{codFee}</span>
                   </div>
                 )}
                 <div className="total-row final-total">
                   <span>Total Amount:</span>
-                  <span>{totalPrice}</span>
+                  <span>₹{totalPrice}</span>
                 </div>
               </div>
             </div>
@@ -232,7 +269,7 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
               className="confirm-order-btn"
               onClick={handleConfirmOrder}
             >
-              Confirm Order - {totalPrice}
+              Confirm Order - ₹{totalPrice}
             </button>
           </form>
         </div>

@@ -54,6 +54,7 @@ const MyOrders = () => {
                             </div>
                             <div className="order-history-body">
                                 <p><strong>Option:</strong> {order.chapatiOption}</p>
+                                <p><strong>Quantity:</strong> {order.quantity || 1}</p>
                                 <p><strong>Total:</strong> ₹{order.totalAmount}</p>
                                 <p><strong>Date:</strong> {order.orderTime.toDate().toLocaleDateString()}</p>
                             </div>

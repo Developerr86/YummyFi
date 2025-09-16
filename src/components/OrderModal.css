@@ -485,3 +485,58 @@
   color: #333; /* Example for text inside summary */
   margin-bottom: 20px;
 }
+
+/* Quantity Selector Styles */
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.quantity-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background: #5a6fd8;
+  transform: scale(1.1);
+}
+
+.quantity-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.quantity-display {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  min-width: 30px;
+  text-align: center;
+}
+
+.quantity-note {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+  font-style: italic;
+}
