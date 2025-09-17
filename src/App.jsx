@@ -8,6 +8,7 @@ import Auth from "./components/Auth";
 import Home from "./components/Home";
 import AdminPanel from "./components/AdminPanel";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotificationHandler from "./components/NotificationHandler";
 import "./App.css";
 
 function AppRoutes() {
@@ -46,6 +47,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App">
+          <NotificationHandler />
           <AppRoutes />
         </div>
       </Router>
