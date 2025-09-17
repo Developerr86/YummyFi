@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { app } from '../firebase';
 import { useAuth } from '../context/AuthContext';
-import './OrderModal.css';
-import upiQrCode from '../assets/upi-qr-code.jpeg'; 
+import { QRCodeSVG } from 'qrcode.react';
+import './OrderModal.css'; 
 
 const OrderModal = ({ isOpen, onClose, itemData }) => {
   const { user } = useAuth();
   const [orderDetails, setOrderDetails] = useState({});
   const [view, setView] = useState('form');
+  const [orderId, setOrderId] = useState(null);
 
   useEffect(() => {
     if (isOpen && itemData?.pricing?.[0]) {
@@ -49,20 +50,26 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
     
     const db = getFirestore(app);
     try {
-      await addDoc(collection(db, 'orders'), {
+      // Create order with pending_payment status for prepaid, pending for COD
+      const orderData = {
         ...orderDetails,
         userId: user.uid,
         userEmail: user.email,
-        customerName: user.name || user.email, // Use name, fallback to email
+        customerName: user.name || user.email,
         orderTime: serverTimestamp(),
-        status: 'pending',
+        status: orderDetails.paymentMethod === 'prepaid' ? 'pending_payment' : 'pending',
         totalAmount: totalPrice,
         menuTitle: itemData.title,
         quantity: orderDetails.quantity || 1
-      });
+      };
+
+      const docRef = await addDoc(collection(db, 'orders'), orderData);
+      
+      // Store the order ID for UPI payment
+      setOrderId(docRef.id);
 
       if (orderDetails.paymentMethod === 'prepaid') {
-        setView('qrCode');
+        setView('makePayment');
       } else {
         setView('confirmation');
       }
@@ -72,24 +79,62 @@ const OrderModal = ({ isOpen, onClose, itemData }) => {
     }
   };
 
+  // Generate UPI Intent string
+  const generateUPIIntent = () => {
+    const businessUpiId = "8736866828@okbizaxis"; // Placeholder for business UPI ID
+    return `upi://pay?pa=${businessUpiId}&pn=YummyFi&am=${totalPrice}&tn=${orderId}`;
+  };
+
   const handleClose = () => {
     setView('form');
+    setOrderId(null);
     onClose();
   };
 
   if (!isOpen) return null;
 
-  // Step 4: Render the correct view based on the state
-  if (view === 'qrCode') {
+  // Make Payment view with dynamic UPI QR code
+  if (view === 'makePayment') {
+    const upiIntent = generateUPIIntent();
+    
     return (
       <div className="modal-overlay">
         <div className="confirmation-modal">
           <div className="confirmation-content">
-            <h2>Scan to Pay ₹{totalPrice}</h2>
-            <p>Please complete your payment using any UPI app.</p>
-            <img src={upiQrCode} alt="UPI QR Code" style={{ maxWidth: '350px', margin: '20px auto' }} />
-            <button className="close-confirmation-btn" onClick={() => setView('confirmation')}>
-              I have paid
+            <h2>Complete Payment</h2>
+            <p className="payment-amount">Pay ₹{totalPrice}</p>
+            <p className="payment-instructions">
+              Scan the QR code with your UPI app or click the button below to pay.
+            </p>
+            
+            <div className="qr-code-container">
+              <QRCodeSVG 
+                value={upiIntent} 
+                size={200}
+                level="M"
+                includeMargin={true}
+              />
+            </div>
+            
+            <a 
+              href={upiIntent} 
+              className="upi-pay-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Pay with UPI App
+            </a>
+            
+            <div className="payment-note">
+              <p><strong>Order ID:</strong> {orderId}</p>
+              <p>Please include this Order ID in your payment note.</p>
+            </div>
+            
+            <button 
+              className="close-confirmation-btn" 
+              onClick={handleClose}
+            >
+              I have paid / Close
             </button>
           </div>
         </div>

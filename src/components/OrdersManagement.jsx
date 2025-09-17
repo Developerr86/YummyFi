@@ -38,6 +38,7 @@ const OrdersManagement = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return '#ffc107';
+      case 'pending_payment': return '#fd7e14';
       case 'confirmed': return '#17a2b8';
       case 'preparing': return '#fd7e14';
       case 'out_for_delivery': return '#6f42c1';
@@ -62,6 +63,10 @@ const OrdersManagement = () => {
           <div className="stat-card">
             <span className="stat-number">{orders.filter(o => o.status === 'pending').length}</span>
             <span className="stat-label">Pending</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-number">{orders.filter(o => o.status === 'pending_payment').length}</span>
+            <span className="stat-label">Pending Payment</span>
           </div>
           <div className="stat-card">
             <span className="stat-number">{orders.filter(o => o.status === 'confirmed').length}</span>
@@ -149,8 +154,24 @@ const OrdersManagement = () => {
 
               <div className="detail-section">
                 <h4>Update Status</h4>
+                
+                {/* Special handling for pending_payment orders */}
+                {selectedOrder.status === 'pending_payment' && (
+                  <div className="payment-confirmation">
+                    <p className="payment-notice">
+                      <strong>Payment Pending:</strong> Customer has placed order but payment confirmation required.
+                    </p>
+                    <button
+                      className="confirm-payment-btn"
+                      onClick={() => updateOrderStatus(selectedOrder.id, 'confirmed')}
+                    >
+                      ✓ Confirm Payment Received
+                    </button>
+                  </div>
+                )}
+                
                 <div className="status-buttons">
-                  {['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'].map(status => (
+                  {['pending', 'pending_payment', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'].map(status => (
                     <button
                       key={status}
                       className={`status-btn ${selectedOrder.status === status ? 'active' : ''}`}

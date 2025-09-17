@@ -540,3 +540,72 @@
   margin: 0;
   font-style: italic;
 }
+
+/* Dynamic UPI Payment Styles */
+.payment-amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #28a745;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.payment-instructions {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.qr-code-container {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #e1e5e9;
+}
+
+.upi-pay-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+  color: white;
+  text-decoration: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 20px 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  text-align: center;
+  width: 200px;
+}
+
+.upi-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+  text-decoration: none;
+  color: white;
+}
+
+.payment-note {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.payment-note p {
+  margin: 5px 0;
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+.payment-note strong {
+  color: #333;
+}
