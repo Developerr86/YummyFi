@@ -9,6 +9,7 @@ import Home from "./components/Home";
 import AdminPanel from "./components/AdminPanel";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotificationHandler from "./components/NotificationHandler";
+import OrderPage from "./components/OrderPage"; // Import the new OrderPage component
 import "./App.css";
 
 function AppRoutes() {
@@ -36,6 +37,7 @@ function AppRoutes() {
           <Route index element={<Home />} />
           <Route path="my-orders" element={<MyOrders />} />
           <Route path="account" element={<MyAccount />} /> {/* Add the new account route */}
+          <Route path="order/:itemId" element={<OrderPage />} /> {/* Add the new order page route */}
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
