@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc } from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, getDoc } from "firebase/firestore";
 import { app } from '../firebase';
 import './OrdersManagement.css';
 
 const OrdersManagement = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [userDetails, setUserDetails] = useState({});
 
   useEffect(() => {
     const db = getFirestore(app);
@@ -24,6 +25,32 @@ const OrdersManagement = () => {
 
     return () => unsubscribe();
   }, []);
+
+  // Fetch user details when an order is selected
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (selectedOrder && selectedOrder.userId && !userDetails[selectedOrder.userId]) {
+        try {
+          const db = getFirestore(app);
+          const userDocRef = doc(db, "users", selectedOrder.userId);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (userDoc.exists()) {
+            setUserDetails(prev => ({
+              ...prev,
+              [selectedOrder.userId]: userDoc.data()
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching user details: ", error);
+        }
+      }
+    };
+
+    if (selectedOrder) {
+      fetchUserDetails();
+    }
+  }, [selectedOrder]);
 
   const updateOrderStatus = async (orderId, newStatus) => {
     const db = getFirestore(app);
@@ -54,6 +81,11 @@ const OrdersManagement = () => {
     }
     return new Date(time).toLocaleString();
   };
+
+  // Get user details for the selected order
+  const currentUserDetails = selectedOrder && userDetails[selectedOrder.userId] 
+    ? userDetails[selectedOrder.userId] 
+    : {};
 
   return (
     <div className="orders-management">
@@ -123,12 +155,14 @@ const OrdersManagement = () => {
             </div>
 
             <div className="details-content">
-               <div className="detail-section">
+              <div className="detail-section">
                 <h4>Customer Information</h4>
-                {/* CORRECTED: Use customerName with a fallback to userEmail */}
                 <p><strong>Name:</strong> {selectedOrder.customerName || selectedOrder.userEmail}</p>
-                {/* CORRECTED: Use the correct field 'userEmail' */}
                 <p><strong>Email:</strong> {selectedOrder.userEmail}</p>
+                <p><strong>Phone:</strong> {currentUserDetails.phone || 'Not provided'}</p>
+                <p><strong>Gender:</strong> {currentUserDetails.gender ? 
+                  currentUserDetails.gender.charAt(0).toUpperCase() + currentUserDetails.gender.slice(1) : 
+                  'Not provided'}</p>
                 <p><strong>Order Time:</strong> {formatTime(selectedOrder.orderTime)}</p>
               </div>
 

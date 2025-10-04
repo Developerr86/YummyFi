@@ -46,17 +46,38 @@ const OrderPage = () => {
     }
   }, [itemId, itemData]);
 
+  // Load user profile data for address auto-fill
   useEffect(() => {
-    if (itemData?.pricing?.[0]) {
-      setOrderDetails({
-        address: '',
-        instructions: '',
-        chapatiOption: itemData.pricing[0].name,
-        paymentMethod: itemData.paymentOptions?.prepaid ? 'prepaid' : 'cod',
-        quantity: 1
-      });
+    const loadUserProfile = async () => {
+      if (user && user.uid) {
+        try {
+          const db = getFirestore(app);
+          const userDocRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            // Pre-fill address from user profile if available
+            const initialAddress = userData.address || '';
+            
+            setOrderDetails(prev => ({
+              address: initialAddress,
+              instructions: prev.instructions || '',
+              chapatiOption: prev.chapatiOption || (itemData?.pricing?.[0]?.name || ''),
+              paymentMethod: prev.paymentMethod || (itemData?.paymentOptions?.prepaid ? 'prepaid' : 'cod'),
+              quantity: prev.quantity || 1
+            }));
+          }
+        } catch (error) {
+          console.error("Error loading user profile: ", error);
+        }
+      }
+    };
+
+    if (itemData && Object.keys(orderDetails).length === 0) {
+      loadUserProfile();
     }
-  }, [itemData]);
+  }, [user, itemData, orderDetails]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -292,6 +313,7 @@ const OrderPage = () => {
               rows="3"
               required
             />
+            <p className="address-note">Auto-filled from your profile. Edit if needed.</p>
           </div>
 
           <div className="form-section">

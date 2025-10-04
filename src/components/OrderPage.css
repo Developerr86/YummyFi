@@ -143,6 +143,13 @@
   border-color: orange;
 }
 
+.address-note {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
+}
+
 .option-selector {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

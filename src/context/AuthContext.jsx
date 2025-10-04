@@ -48,7 +48,21 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Fetch user data from Firestore after login
+      const db = getFirestore(app);
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        setUser({
+          ...userCredential.user,
+          ...userDoc.data()
+        });
+      } else {
+        setUser(userCredential.user);
+      }
+      
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -65,6 +79,15 @@ export const AuthProvider = ({ children }) => {
           email: email,
           role: 'user' // All new signups default to the 'user' role.
       });
+      
+      // Update the user state with the new data
+      setUser({
+        ...userCredential.user,
+        name: name,
+        email: email,
+        role: 'user'
+      });
+      
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };

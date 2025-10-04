@@ -1,38 +1,100 @@
 .my-account-container {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 800px;
+  margin: 20px auto;
   padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .my-account-container h2 {
-  font-size: 2rem;
   color: #333;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
 }
 
 .account-card {
   background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
 }
 
-.account-card p {
-  font-size: 1.1rem;
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
   color: #555;
 }
 
-.account-logout-btn {
-  background: #dc3545;
-  color: white;
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.account-logout-btn,
+.save-profile-btn {
+  width: 100%;
+  padding: 14px;
   border: none;
-  padding: 12px 25px;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 20px;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.save-profile-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.save-profile-btn:hover {
+  background-color: #45a049;
+}
+
+.save-profile-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.account-logout-btn {
+  background-color: #f44336;
+  color: white;
 }
 
 .account-logout-btn:hover {
-  background: #c82333;
+  background-color: #d32f2f;
+}
+
+.address-note {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
 }
